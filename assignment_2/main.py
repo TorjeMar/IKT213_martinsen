@@ -2,11 +2,11 @@ import cv2
 import numpy as np
 
 def padding(image, border_with):
-    padded_image = cv2.copyMakeBorder(image, border_with, border_with, border_with, border_with, cv2.BORDER_CONSTANT)
+    padded_image = cv2.copyMakeBorder(image, border_with, border_with, border_with, border_with, cv2.BORDER_REFLECT_101)
     cv2.imwrite("images/padded_image.png", padded_image)
 
 def cropping(image, x_0, x_1,  y_0, y_1):
-    cropped_image = image[x_0:x_1, y_0:y_1]
+    cropped_image = image[y_0:y_1, x_0:x_1]
     cv2.imwrite("images/cropped_image.png", cropped_image)
 
 def resize(image, width, height):
@@ -26,14 +26,15 @@ def hsv(image):
     cv2.imwrite("images/hsv_image.png", hsv_image)
 
 def hue_shifted(image, emptyPictureArray, hue):
-    shifted_image = emptyPictureArray[:] = image    
-    shifted_image = shifted_image + hue    
-    cv2.imwrite("images/hue_shifted_image.png", shifted_image)
+    shifted_image = image + hue
+    shifted_image = np.clip(shifted_image, 0, 255)
+    emptyPictureArray[:] = shifted_image
+    cv2.imwrite("images/hue_shifted_image.png", emptyPictureArray)
+    return emptyPictureArray
 
 def smoothing(image):
     smoothed_image = cv2.GaussianBlur(image, (15, 15), cv2.BORDER_DEFAULT)
     cv2.imwrite("images/smoothed_image.png", smoothed_image)
-
 
 def rotation(image, rotation_angle):
     if rotation_angle == 90:

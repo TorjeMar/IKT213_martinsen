@@ -5,7 +5,7 @@ def padding(image, border_with):
     padded_image = cv2.copyMakeBorder(image, border_with, border_with, border_with, border_with, cv2.BORDER_REFLECT_101)
     cv2.imwrite("images/padded_image.png", padded_image)
 
-def cropping(image, x_0, x_1,  y_0, y_1):
+def crop(image, x_0, x_1,  y_0, y_1):
     cropped_image = image[y_0:y_1, x_0:x_1]
     cv2.imwrite("images/cropped_image.png", cropped_image)
 
@@ -14,8 +14,11 @@ def resize(image, width, height):
     cv2.imwrite("images/resized_image.png", resized_image)
 
 def copy(image, emptyPictureArray):
-    copied_image = emptyPictureArray[:] = image
-    cv2.imwrite("images/copied_image.png", copied_image)
+    height, width = image.shape[:2]
+    for y in range(height):
+        for x in range(width):
+            emptyPictureArray[y, x] = image[y, x]
+    cv2.imwrite("images/copied_image.png", emptyPictureArray)
 
 def grayscale(image):
     grayscaled_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -26,11 +29,10 @@ def hsv(image):
     cv2.imwrite("images/hsv_image.png", hsv_image)
 
 def hue_shifted(image, emptyPictureArray, hue):
-    shifted_image = image + hue
-    shifted_image = np.clip(shifted_image, 0, 255)
-    emptyPictureArray[:] = shifted_image
+    shifted = image.astype(np.int16) + int(hue)
+    shifted = np.clip(shifted, 0, 255).astype(np.uint8)
+    emptyPictureArray[:] = shifted
     cv2.imwrite("images/hue_shifted_image.png", emptyPictureArray)
-    return emptyPictureArray
 
 def smoothing(image):
     smoothed_image = cv2.GaussianBlur(image, (15, 15), cv2.BORDER_DEFAULT)
@@ -45,11 +47,10 @@ def rotation(image, rotation_angle):
 
 if __name__ == "__main__":
     image = cv2.imread("lena-1.png")
-    height = 512
-    width = 512
+    height, width = image.shape[:2]
     emptyPictureArray = np.zeros((height, width, 3), dtype=np.uint8)
     padding(image, 100)
-    cropping(image, 130, 432, 130, 432)
+    crop(image, 80, 382, 80, 382)
     resize(image, 200, 200)
     copy(image, emptyPictureArray)
     grayscale(image)
